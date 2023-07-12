@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.goodee.mvcboard.mapper.BoardMapper">
+	
+	<delete id="deleteBoard" parameterType="com.goodee.mvcboard.vo.Board">
+		DELETE FROM board
+		WHERE board_no = #{boardNo}
+		AND member_id = #{memberId}
+	</delete>
+	
+	<update id="updateBoard" parameterType="com.goodee.mvcboard.vo.Board">
+		UPDATE board 
+		SET 
+			local_name = #{localName},
+			board_title = #{boardTitle},
+			board_content = #{boardContent},
+			updatedate = NOW()
+		WHERE board_no = #{boardNo}
+		AND member_id = #{memberId}
+	</update>
+	
+	<insert id="insertBoard" parameterType="com.goodee.mvcboard.vo.Board">
+		INSERT INTO board(
+			local_name,
+			board_title,
+			board_content,
+			member_id,
+			createdate,
+			updatedate
+		) VALUES (
+			#{localName},
+			#{boardTitle},
+			#{boardContent},
+			#{memberId},
+			NOW(),
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectBoard" 
+			parameterType="com.goodee.mvcboard.vo.Board"
+			resultType="com.goodee.mvcboard.vo.Board">
+		SELECT 
+			board_no boardNo,
+			local_name localName,
+			board_title boardTitle,
+			board_content boardContent,
+			member_id memberId,
+			createdate,
+			updatedate
+		FROM board
+		WHERE board_no = #{boardNo}
+	</select>
+	
 	<select id="selectLocalNameList" 
 			resultType="java.util.Map"> <!-- mybatis에서 select의 결과물은 항상 List이므로 어떤 List인지를 적는다 -->
 		SELECT local_name localName, count(*) cnt 
@@ -19,12 +70,20 @@
 			member_id memberId,
 			createdate
 		FROM board
+		<where>
+			<if test="localName != null &amp;&amp; localName != ''"> <!-- localName이 null이 아니고 공백이 아닐때만 where절이 생긴다 -->
+				local_name = #{localName}
+			</if>
+		</where>
 		ORDER BY createdate DESC
 		LIMIT #{beginRow}, #{rowPerPage}
 		<!-- mybatis표현식 #{} : 매개값이 단일값이 아니면 저장한 속성이름 -->
 	</select>
 	
-	<select id="selectBoardCount" resultType="int">
+	<select id="selectBoardCount" parameterType="String" resultType="int">
 		SELECT count(*)	FROM board
+		<where>
+			local_name = #{localName}
+		</where>
 	</select>
 </mapper>

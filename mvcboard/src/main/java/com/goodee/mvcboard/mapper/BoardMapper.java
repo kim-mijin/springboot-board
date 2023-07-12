@@ -9,6 +9,15 @@ import com.goodee.mvcboard.vo.Board;
 
 @Mapper //Mapper 애노테이션 :  1. mapper xml과 함께하여 dao class가 만들어짐 2. 애노테이션이 있어야 spring에 의하여 BoardMapper를 implements한 class가 만들어짐
 public interface BoardMapper {
+	
+	Board selectBoard(Board board);
+	
+	int deleteBoard(Board board);
+	
+	int updateBoard(Board board);
+	
+	int insertBoard(Board board);
+	
 	//local_name컬럼과 count()를 반환
 	List<Map<String, Object>> selectLocalNameList(); 
 	//추상메서드 -> 메서드 구현이 없는 메서드
@@ -20,5 +29,5 @@ public interface BoardMapper {
 	List<Board> selectBoardListByPage(Map<String, Object> map); 
 	
 	//전체 행의 수
-	int selectBoardCount();
+	int selectBoardCount(String localName);
 }
