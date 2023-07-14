@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,13 +7,15 @@
 <!-- bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <title>modify board</title>
 </head>
 <body>
 <div>
 	<h1>게시글 수정</h1>
 	<div>
-		<form action="/board/modifyBoard" method="post">
+		<form action="/board/modifyBoard" method="post" enctype="multipart/form-data">
 			<div>
 				<table>
 					<tr>
@@ -49,6 +52,21 @@
 						<td><label for="memberId">member_id</label></td>
 						<td>
 							<input type="text" id="memberId" name="memberId" value="${board.memberId}" readonly>
+						</td>
+					</tr>
+					<tr>
+						<td>기존 파일</td>
+						<td>
+							<ul>
+								<c:forEach var="bf" items="${boardfileList}">
+									<li id="${bf.saveFilename}">
+										${bf.originFilename}<a href="/board/removeBoardfileOne?boardfileNo=${bf.boardfileNo}">삭제</a>
+									</li>
+								</c:forEach>
+								<li>
+									<input type="file" name="multipartFile" multiple>
+								</li>
+							</ul>
 						</td>
 					</tr>
 				</table>

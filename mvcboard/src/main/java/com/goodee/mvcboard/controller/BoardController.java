@@ -1,6 +1,9 @@
 package com.goodee.mvcboard.controller;
 
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.goodee.mvcboard.service.BoardService;
 import com.goodee.mvcboard.vo.Board;
+import com.goodee.mvcboard.vo.Boardfile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,21 +47,28 @@ public class BoardController {
 	//게시글 상세보기 페이지로 이동
 	@GetMapping("/board/boardOne")
 	public String boardOne(Model model, Board board) {
-		model.addAttribute("board", boardService.getBoard(board));
+		Map<String, Object> resultMap = boardService.getBoard(board);
+		model.addAttribute("board", resultMap.get("board"));
+		model.addAttribute("boardfileList", resultMap.get("boardfileList"));
 		return "/board/boardOne";
 	}
 	
 	//게시글 수정폼으로 이동
 	@GetMapping("/board/modifyBoard")
 	public String modifyBoard(Model model, Board board) {
-		model.addAttribute("board", boardService.getBoard(board)); //수정 전 데이터를 받아서 model 속성영역에 저장
+		//수정 전 기존 데이터 받기
+		//board
+		model.addAttribute("board", boardService.getBoard(board).get("board")); //수정 전 데이터를 받아서 model 속성영역에 저장
+		//boardfile
+		model.addAttribute("boardfileList", boardService.getBoard(board).get("boardfileList"));
 		return "/board/modifyBoard";
 	}
 	
 	//게시글 수정액션
 	@PostMapping("/board/modifyBoard")
-	public String modifyBoard(Board board) {
-		int row = boardService.modifyBoard(board);
+	public String modifyBoard(Board board, HttpServletRequest request) {
+		String path = request.getServletContext().getRealPath("/upload");
+		int row = boardService.modifyBoard(board, path);
 		log.debug(""+row);
 		return "redirect:/board/boardOne?boardNo="+board.getBoardNo();
 	}
@@ -65,14 +76,16 @@ public class BoardController {
 	//게시글 삭제폼으로 이동
 	@GetMapping("/board/removeBoard")
 	public String removeBoard(Model model, Board board) {
-		model.addAttribute("board", boardService.getBoard(board));
+		Map<String, Object> resultMap = boardService.getBoard(board);
+		model.addAttribute("board", resultMap.get("board"));
 		return "/board/removeBoard";
 	}
 	
 	//게시글 삭제액션
 	@PostMapping("/board/removeBoard")
-	public String removeBoard(Board board) {
-		int row = boardService.removeBoard(board);
+	public String removeBoard(HttpServletRequest request, Board board) {
+		String path = request.getServletContext().getRealPath("/upload/");
+		int row = boardService.removeBoard(board, path);
 		log.debug(""+row);
 		return "redirect:/board/boardList";
 	}
@@ -85,8 +98,10 @@ public class BoardController {
 	
 	//addBoard 입력액션 처리
 	@PostMapping("/board/addBoard")
-	public String addBoard(Board board) { //커맨드 객체를 매개값으로 받는다
-		int row = boardService.addBoard(board);
+	public String addBoard(HttpServletRequest request, Board board) { //커맨드 객체를 매개값으로 받는다
+		//request api를 직접호출하기 위해 HttpServletRequest객체를 매개값으로 받는다
+		String path = request.getServletContext().getRealPath("/upload/");
+		int row = boardService.addBoard(board, path);
 		log.debug("\u001B[43m"+"row : " + row + "\u001B[0m");
 		return "redirect:/board/boardList"; //redirect
 	}

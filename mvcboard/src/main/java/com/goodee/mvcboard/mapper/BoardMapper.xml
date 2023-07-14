@@ -20,6 +20,9 @@
 	</update>
 	
 	<insert id="insertBoard" parameterType="com.goodee.mvcboard.vo.Board">
+		<selectKey order="AFTER" keyProperty="boardNo" resultType="java.lang.Integer"> <!-- 파라미터로 받은 Board의 비어있는 boardNo필드에 반환된 키값을 저장한다 (***참조타입이 매개변수인 경우 참조주소를 넘겨준다***) -->
+			SELECT last_insert_id()
+		</selectKey>
 		INSERT INTO board(
 			local_name,
 			board_title,
